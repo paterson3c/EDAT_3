@@ -7,7 +7,7 @@ LDFLAGS=-L./
 LDLIBS=-lstack_fp
 ### -lm enlaza la biblioteca matematica, -pthread enlaza la biblioteca de hilos
 LIBS = -lm -pthread
-EJS = p1_e1 p1_e2 p1_e3 p2_e1a p2_e1b p2_e2
+EJS = p3_e1
 ########################################################
 OBJECTSP1E1 = p1_e1.o vertex.o
 OBJECTSP1E2 = p1_e2.o graph.o vertex.o
@@ -18,6 +18,7 @@ OBJECTSP1E3 = p1_e3.o graph.o vertex.o
 OBJECTSP2E1A = p2_e1a.o libstack_fp.a
 OBJECTSP2E1B = p2_e1b.o vertex.o libstack_fp.a
 OBJECTSP2E2	 = p2_e2.o vertex.o graph.o algorithms.o libstack_fp.a
+OBJECTSP3E1 = p3_e1.o vertex.o delivery.o libqueue.a
 ########################################################
 
 all: $(EJS) libstack_fp.a
@@ -43,6 +44,12 @@ p2_e1b: $(OBJECTSP2E1B)
 p2_e2: $(OBJECTSP2E2)
 	$(CC) -o $@ $^ $(LDFLAGS) $(LDLIBS) $(LIBS)
 
+p3_e1: $(OBJECTSP3E1)
+	$(CC) -o $@ $^ $(LDFLAGS) -lqueue $(LIBS)
+
+p3_e1.o: p3_e1.c vertex.h delivery.h
+	$(CC) -c -o $@ $< $(CFLAGS) $(IFLAGS)
+
 p2_e2.o: p2_e2.c vertex.h graph.h algorithms.h
 	$(CC) -c -o $@ $< $(CFLAGS) $(IFLAGS)
 
@@ -66,6 +73,9 @@ vertex.o: vertex.c vertex.h
 
 graph.o: graph.c graph.h vertex.h
 	$(CC) $(CFLAGS) -c graph.c
+
+delivery.o: delivery.c delivery.h vertex.h
+	$(CC) $(CFLAGS) -c delivery.c
 
 ###########################################################################################################################################
 ######	CREA LA BIBLIOTECA CON LAS FUENTES: stack.c file_utils.c
@@ -115,3 +125,5 @@ runv:
 	valgrind --leak-check=full --track-origins=yes ./p2_e1b cities1.txt cities2.txt
 	@echo ">>>>>>Running p2_e2 with valgrind"
 	valgrind --leak-check=full --track-origins=yes ./p2_e2 g2.txt 100 700
+	@echo ">>>>>>Running p3_e1 with valgrind"
+	valgrind --leak-check=full --track-origins=yes ./p3_e1 requests.txt

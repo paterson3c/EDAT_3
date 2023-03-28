@@ -110,14 +110,46 @@ Queue *delivery_getPlan (Delivery *d){
 }
 
 Status delivery_add(FILE *pf, Delivery *d, void *p, p_element_print f){
-  /* TO DO */
+  if(!pf || !d || !p || !f)
+    return ERROR;
+
+  if(queue_push(d->plan, p) == ERROR)
+    return ERROR;
+  
+  fprintf(pf, "Adding: ");
+  f(pf, p);
+  fprintf(pf, "  to delivery: %s\n" , d->name);
   
   return OK;
 }
 
 Status delivery_run_plan(FILE *pf, Delivery *d, p_element_print fprint, p_element_free ffree){
-  /* TO DO */
+  void *e[queue_size(d->plan)];
+  int i = 0, j=0, k=0;
+
+  if(!pf || !d || !fprint || !ffree)
+    return ERROR;
+
+  fprintf(pf, "\nRunning delivery plan for queue:\n");
+  queue_print(pf, d->plan, fprint);
   
+  for(i=0, j=0; queue_isEmpty(d->plan) == FALSE; i++) {
+    fprintf(pf, "Delivering %s requested by %s to ", d->product_name, d->name);
+    if((e[i] = queue_pop(d->plan)) == NULL) {
+      for(k=0; k<j; k++) {
+        ffree(e[k]);
+      }
+      return ERROR;
+    }
+    fprint(pf, e[i]);
+    fprintf(pf, "\n");
+    j++;
+  }
+
+  for(k=0; k<j; k++) {
+    ffree(e[k]);
+  }
+
   return OK;
 }
 
