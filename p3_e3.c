@@ -6,20 +6,6 @@
 
 #define MAX_SIZE 128
 
-
-/**
- * @brief Se leerán notas del fichero de
-manera que la primera, tercera, quinta, etc. se insertarán por el final de una lista, mientras que
-las demás (segunda, cuarta, sexta, etc.) se insertarán por el principio. Cuando se ha terminado
-de insertar, el programa irá extrayendo los elementos de la lista de uno en uno: la primera mitad
-desde el principio y la segunda mitad por el final. Cada vez que se extraiga una nota de la lista
-(ya sea del principio o del final) se insertará en orden en otra lista de acuerdo a una función de
-comparación. El orden será creciente o decreciente, según indique un argumento recibido en
-línea de comandos (por terminal): 1 indicará que los elementos se han de insertar de manera
-creciente en la lista y ‑1 indicará orden decreciente.
-Para trabajar con los floats se pueden utilizar las funciones de la práctica anterior, especificadas
-9
-*/
 int main(int argc, char* argv[]) {
     List *l1 = NULL, *l2 = NULL;
     FILE *f;
