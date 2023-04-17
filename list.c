@@ -2,6 +2,7 @@
 #include <stdlib.h>
 #include <string.h>
 #include "list.h"
+#include "file_utils.h"
 
 typedef struct _NodeList {
   void* data;
@@ -54,8 +55,8 @@ Bool list_isEmpty(const List *pl) {
   if (pl == NULL) 
     return TRUE;
 
-  if (pl->last->next == NULL)
-     return TRUE;
+  if (pl->last == NULL) 
+    return TRUE;
 
   return FALSE;
 }
@@ -130,43 +131,56 @@ Status list_pushInOrder (List *pl, void *e, P_ele_cmp f, int order) {
     NodeList *pn2 = NULL;
     int cmp = 0;
     
-    if (pl == NULL || e == NULL || f == NULL)
-     return ERROR;
+    if(pl == NULL || e == NULL || f == NULL || (order < 0 && order > 0))
+        return ERROR;
     
     pn = node_new();
-    if (pn == NULL) 
+    if(pn == NULL)
         return ERROR;
     
     pn->data = (void *)e;
-    if (list_isEmpty(pl) == TRUE) {
-        pn->next = pn;
-        pl->last = pn;
-    } 
+
+    if(list_isEmpty(pl) == TRUE) {
+      pn->next = pn;
+      pl->last = pn;
+    }
     else {
-        pn2 = pl->last->next;
-        cmp = f(pn2->data, e);
-        if (order > 0) {
-            while (pn2 != pl->last && cmp < 0) {
-                pn2 = pn2->next;
-                cmp = f(pn2->data, e);
-            }
-        } 
-        else {
-            while (pn2 != pl->last && cmp > 0) {
-                pn2 = pn2->next;
-                cmp = f(pn2->data, e);
-            }
-        }
-    
+      pn2 = pl->last->next;
+      cmp = f(pn2->data, e);
+      if((cmp > 0 && order > 0) || (cmp < 0 && order < 0)) {
+        pn->next = pn2;
+        pl->last->next = pn;
+      }
+      else if(cmp == 0) {
         pn->next = pn2->next;
         pn2->next = pn;
-        if (pn2 == pl->last) {
+      }
+      else {
+        do {
+          cmp = f(pn2->next->data, e);
+          if((cmp > 0 && order > 0) || (cmp < 0 && order < 0)) {
+            pn->next = pn2->next;
+            pn2->next = pn;
+            return OK;
+          } 
+          pn2 = pn2->next;
+        } while(pn2->next != pl->last->next);
+
+        cmp = f(pl->last->data, e);
+        if((cmp > 0 && order == 1) || (cmp < 0 && order == -1)) {
+            pn->next = pn2->next;
+            pn2->next = pn;
+        } else {
+            pn->next = pl->last->next;
+            pl->last->next = pn;
             pl->last = pn;
         }
+      }
     }
     
     return OK;
 }
+
 
 
 void *list_popFront(List *pl) {
@@ -220,6 +234,7 @@ void *list_popBack(List *pl) {
 }
 
 void list_free(List *pl) {
+  void *pe = NULL;
   if (pl == NULL) return;
 
   while (list_isEmpty(pl) == FALSE) {
@@ -231,21 +246,19 @@ void list_free(List *pl) {
 
 size_t list_size (const List *pl){
   NodeList *pn;
-/*  int cont=1;*/
+  int cont = 1;
 
   if(!pl)
    return -1;
 
-  return (pl->last + 1);
-
-/* Valdria con lo de arriba o habria que hacer un conteo como hago aqui
   pn = pl->last->next;
+
   while( pn != pl->last) {
     cont++;
     pn = pn->next;
   }
+
   return cont;
-*/
 }
 
 int list_print(FILE* fp, const List *pl,  P_ele_print f){
@@ -255,17 +268,20 @@ int list_print(FILE* fp, const List *pl,  P_ele_print f){
   if (!fp || !pl || !f) 
     return -1;
 
-	fprintf (fp, "SIZE: %d \n", list_size(pl));
+	fprintf (fp, "SIZE: %ld \n", list_size(pl));
 
   if( list_isEmpty(pl)==TRUE ) 
     return -1;
 
   pn = pl->last->next;
 
-  while( pn != pl->last) {
+  do {
     n += f (fp, pn->data);
+    n+= fprintf(fp, " ");
     pn = pn->next;
-  }
+  } while( pn != pl->last);
 
+  n += f (fp, pn->data);
+  n += fprintf(fp, "\n");
 	return n;
 }
