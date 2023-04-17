@@ -107,13 +107,65 @@ Status list_pushBack(List *pl, void *e) {
   return OK;
 }
 
-Status list_pushInOrder (List *pl, void *e, P_ele_cmp f, int order){
-  NodeList *pn == NULL;
-  if(pl == NULL || e == NULL || !f )
-    return ERROR;
 
-  
-  
+/**
+ * @brief Public function that pushes an element into an ordered list.
+ *
+ * Inserts in its position a reference of the element received as argument.
+ *
+ * Note that it is necessary to traverse the list in order to obtain the
+ * insert position, so this operation is linear in the number of List elements.
+ *
+ * @param pl Pointer to the List.
+ * @param e Pointer to the element to be inserted into the List.
+ * @param f A pointer to the function that must be used to compare the elements.
+ * @param order Must takes a positive value for a crescent list and negative
+ *  value for decrescent list.
+ *
+ * @return Status value OK if the insertion could be done, Status value ERROR
+ * otherwise.
+ */
+Status list_pushInOrder (List *pl, void *e, P_ele_cmp f, int order) {
+    NodeList *pn = NULL;
+    NodeList *pn2 = NULL;
+    int cmp = 0;
+    
+    if (pl == NULL || e == NULL || f == NULL)
+     return ERROR;
+    
+    pn = node_new();
+    if (pn == NULL) 
+        return ERROR;
+    
+    pn->data = (void *)e;
+    if (list_isEmpty(pl) == TRUE) {
+        pn->next = pn;
+        pl->last = pn;
+    } 
+    else {
+        pn2 = pl->last->next;
+        cmp = f(pn2->data, e);
+        if (order > 0) {
+            while (pn2 != pl->last && cmp < 0) {
+                pn2 = pn2->next;
+                cmp = f(pn2->data, e);
+            }
+        } 
+        else {
+            while (pn2 != pl->last && cmp > 0) {
+                pn2 = pn2->next;
+                cmp = f(pn2->data, e);
+            }
+        }
+    
+        pn->next = pn2->next;
+        pn2->next = pn;
+        if (pn2 == pl->last) {
+            pl->last = pn;
+        }
+    }
+    
+    return OK;
 }
 
 
@@ -188,12 +240,10 @@ size_t list_size (const List *pl){
 
 /* Valdria con lo de arriba o habria que hacer un conteo como hago aqui
   pn = pl->last->next;
-
   while( pn != pl->last) {
     cont++;
     pn = pn->next;
   }
-
   return cont;
 */
 }
@@ -219,4 +269,3 @@ int list_print(FILE* fp, const List *pl,  P_ele_print f){
 
 	return n;
 }
-
