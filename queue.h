@@ -6,6 +6,8 @@
 #define	QUEUE_H
 
 #include <stdio.h>
+#include <stdlib.h>
+#include <string.h>
 #include "types.h"
 
 /** 
@@ -106,6 +108,6 @@ size_t queue_size(const Queue *q);
  * @return On success this function returns the number of characters printed. In 
  * case of error it returns a negative value.
  *  */
-int queue_print(FILE *fp, const Queue *q, p_queue_ele_print f);
+int queue_print(FILE *fp, Queue *q, p_queue_ele_print f);
 
 #endif	/* QUEUE_H */

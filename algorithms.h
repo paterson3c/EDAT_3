@@ -5,6 +5,7 @@
 #include "stack.h"
 #include "file_utils.h"
 #include "types.h"
+#include "queue.h"  
 /**
 * @brief: Merges two stacks
 *
@@ -28,3 +29,19 @@ of a graph using the depth-first search algorithm
 * @return The function returns OK or ERROR
 **/
 Status graph_depthSearch (Graph *g, long from_id, long to_id);
+
+
+/**
+ * @brief: Makes a search from the origin vertex to the destination vertex
+ * of a graph using the breath-first search algorithm
+ * using an ADT Queue
+ * 
+ * The function prints each visited vertex while traversing the graph
+ * 
+ * @param g, Pointer to graph
+ * @param from_id, id of the origin Vertex
+ * @param to_id, id of the destination Vertex
+ * @return The function returns OK or ERROR
+ **/
+
+Status graph_breathSearch (Graph *g, long from_id, long to_id);

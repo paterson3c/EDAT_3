@@ -15,6 +15,7 @@
 #include <stdio.h>
 #include "types.h"
 #include "queue.h"
+#include "vertex.h"
 
 /** 
  * @brief Data structure to implement the ADT Delivery. 
